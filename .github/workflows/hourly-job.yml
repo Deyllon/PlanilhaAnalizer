@@ -22,10 +22,23 @@ jobs:
         shell: bash
         env:
           VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          VPS_SSH_PASSPHRASE: ${{ secrets.VPS_SSH_PASSPHRASE }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/id_vps
+          chmod 600 ~/.ssh/id_vps
+
+          eval "$(ssh-agent -a /tmp/ssh_agent.sock)"
+          echo "SSH_AUTH_SOCK=/tmp/ssh_agent.sock" >> "$GITHUB_ENV"
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
+
+          cat > ~/.ssh/askpass.sh <<'EOF'
+          #!/bin/sh
+          printf '%s\n' "$VPS_SSH_PASSPHRASE"
+          EOF
+          chmod 700 ~/.ssh/askpass.sh
+
+          DISPLAY=:0 SSH_ASKPASS=~/.ssh/askpass.sh setsid ssh-add ~/.ssh/id_vps < /dev/null
           ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
 
       - name: Ensure remote directories
