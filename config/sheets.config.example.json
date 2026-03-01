@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "sheetId": "google-sheet-id-1",
+      "spreadsheetLabel": "govisanews",
+      "tabs": [
+        {
+          "tabName": "Março",
+          "headerRow": 2
+        }
+      ]
+    }
+  ],
+  "statusMap": {
+    "pending": ["Pendente"],
+    "recorded": ["Gravado"],
+    "inProduction": ["Em produção"],
+    "inCopy": ["Em copy"],
+    "inAdjustment": ["Em ajuste"],
+    "inApproval": ["Em aprovação"],
+    "approved": ["Aprovada", "Aprovado"],
+    "scheduled": ["Agendada", "Agendado"],
+    "posted": ["Postada", "Postado"],
+    "cancelled": ["Cancelada", "Cancelado"],
+    "paused": ["Pausa/Alterada"]
+  },
+  "owners": {
+    "recorded": "Maju",
+    "copy": "Gustavo",
+    "approval": "Você",
+    "productionByFormat": {
+      "Reels": "Maju",
+      "Estático": "Elaine",
+      "Carrossel": "Elaine"
+    }
+  }
+}

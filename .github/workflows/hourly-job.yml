@@ -1,0 +1,89 @@
+name: hourly-job
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 08:00-20:00 America/Sao_Paulo (UTC-3) => 11:00-23:00 UTC
+    - cron: "0 11-23 * * *"
+    # 21:00 America/Sao_Paulo (UTC-3) => 00:00 UTC do dia seguinte
+    - cron: "0 0 * * *"
+
+jobs:
+  run-job:
+    runs-on: ubuntu-latest
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      REMOTE_PATH: apps/planilha-analizer
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH
+        shell: bash
+        env:
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Ensure remote directories
+        shell: bash
+        run: |
+          ssh "$VPS_USER@$VPS_HOST" "mkdir -p ~/$REMOTE_PATH ~/$REMOTE_PATH/config ~/$REMOTE_PATH/data"
+
+      - name: Sync project to VPS
+        shell: bash
+        run: |
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude "node_modules" \
+            --exclude "coverage" \
+            --exclude "data" \
+            --exclude ".env" \
+            --exclude "config/service-account.json" \
+            ./ "$VPS_USER@$VPS_HOST:~/$REMOTE_PATH/"
+
+      - name: Upload service account
+        shell: bash
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          SERVICE_ACCOUNT_FILE="$(mktemp)"
+          trap 'rm -f "$SERVICE_ACCOUNT_FILE"' EXIT
+          printf '%s' "$GOOGLE_SERVICE_ACCOUNT_JSON" > "$SERVICE_ACCOUNT_FILE"
+          scp "$SERVICE_ACCOUNT_FILE" "$VPS_USER@$VPS_HOST:~/$REMOTE_PATH/config/service-account.json"
+
+      - name: Upload runtime env
+        shell: bash
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_WHATSAPP_FROM: ${{ secrets.TWILIO_WHATSAPP_FROM }}
+          TWILIO_CONTENT_SID: ${{ secrets.TWILIO_CONTENT_SID }}
+          WHATSAPP_RECIPIENT: ${{ secrets.WHATSAPP_RECIPIENT }}
+          WHATSAPP_TEMPLATE_NAME: ${{ secrets.WHATSAPP_TEMPLATE_NAME }}
+        run: |
+          ENV_FILE="$(mktemp)"
+          trap 'rm -f "$ENV_FILE"' EXIT
+          {
+            printf 'APP_TIMEZONE=America/Sao_Paulo\n'
+            printf 'GOOGLE_SERVICE_ACCOUNT_FILE=./config/service-account.json\n'
+            printf 'WHATSAPP_PROVIDER=twilio\n'
+            printf 'TWILIO_ACCOUNT_SID=%s\n' "$TWILIO_ACCOUNT_SID"
+            printf 'TWILIO_AUTH_TOKEN=%s\n' "$TWILIO_AUTH_TOKEN"
+            printf 'TWILIO_WHATSAPP_FROM=%s\n' "$TWILIO_WHATSAPP_FROM"
+            printf 'TWILIO_CONTENT_SID=%s\n' "$TWILIO_CONTENT_SID"
+            printf 'WHATSAPP_RECIPIENT=%s\n' "$WHATSAPP_RECIPIENT"
+            printf 'WHATSAPP_TEMPLATE_NAME=%s\n' "$WHATSAPP_TEMPLATE_NAME"
+            printf 'WHATSAPP_TEMPLATE_LANG=pt_BR\n'
+            printf 'DATABASE_URL=./data/app.db\n'
+            printf 'SHEETS_CONFIG_PATH=./config/sheets.config.json\n'
+          } > "$ENV_FILE"
+          scp "$ENV_FILE" "$VPS_USER@$VPS_HOST:~/$REMOTE_PATH/.env"
+
+      - name: Install dependencies and run worker
+        shell: bash
+        run: |
+          ssh "$VPS_USER@$VPS_HOST" "cd ~/$REMOTE_PATH && npm install && npm run job:once"

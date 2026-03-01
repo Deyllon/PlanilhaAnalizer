@@ -1,0 +1,19 @@
+{
+  "name": "planilha-analizer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "job:once": "node --experimental-strip-types src/cli/run-once.ts",
+    "job:dry-run": "node --experimental-strip-types src/cli/dry-run.ts",
+    "job:scheduler": "node --experimental-strip-types src/cli/scheduler.ts",
+    "job:preview-messages": "node --experimental-strip-types src/cli/preview-messages.ts",
+    "test": "node --experimental-strip-types tests/run-all.ts",
+    "test:unit": "node --experimental-strip-types tests/run-all.ts unit",
+    "test:integration": "node --experimental-strip-types tests/run-all.ts integration",
+    "test:coverage": "node --experimental-strip-types --experimental-test-coverage tests/run-all.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3"
+  }
+}

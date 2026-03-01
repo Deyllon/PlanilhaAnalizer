@@ -1,0 +1,67 @@
+{
+  "sources": [
+    {
+      "sheetId": "1RLqDjv1Y8gRISqAIF-1ALMxbvOlkrkZ2HphwBbEXwRk",
+      "spreadsheetLabel": "govisaconect",
+      "tabs": [
+        {
+          "tabName": "MARÇO FEED",
+          "headerRow": 2
+        }
+      ]
+    },
+    {
+      "sheetId": "1abfmWerD6w6l0GgnFaL7LWeblyOfXK0JnyWz6hcFlOs",
+      "spreadsheetLabel": "govisalawfirm",
+      "tabs": [
+        {
+          "tabName": "MARÇO FEED",
+          "headerRow": 2
+        }
+      ]
+    },
+    {
+      "sheetId": "1mLoKoxvZpVM8qyMhXe4JqYWrWTXGXgrj96r1S67cHdA",
+      "spreadsheetLabel": "govisanews",
+      "tabs": [
+        {
+          "tabName": "MARÇO FEED",
+          "headerRow": 2
+        }
+      ]
+    },
+    {
+      "sheetId": "1WL7LMrz3lFrxbW6N5IPpun98TCxgtGGA60HYIymtvtQ",
+      "spreadsheetLabel": "govisacorp",
+      "tabs": [
+        {
+          "tabName": "MARÇO",
+          "headerRow": 2
+        }
+      ]
+    }
+  ],
+  "statusMap": {
+    "pending": ["Pendente"],
+    "recorded": ["Gravado"],
+    "inProduction": ["Em produção"],
+    "inCopy": ["Em copy"],
+    "inAdjustment": ["Em ajuste"],
+    "inApproval": ["Em aprovação"],
+    "approved": ["Aprovada", "Aprovado"],
+    "scheduled": ["Agendada", "Agendado"],
+    "posted": ["Postada", "Postado"],
+    "cancelled": ["Cancelada", "Cancelado"],
+    "paused": ["Pausa/Alterada"]
+  },
+  "owners": {
+    "recorded": "Maju",
+    "copy": "Gustavo",
+    "approval": "Você",
+    "productionByFormat": {
+      "Reels": "Maju",
+      "Estático": "Elaine",
+      "Carrossel": "Elaine"
+    }
+  }
+}
