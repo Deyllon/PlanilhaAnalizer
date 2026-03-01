@@ -45,12 +45,13 @@ jobs:
       - name: Ensure remote directories
         shell: bash
         run: |
-          ssh "$VPS_USER@$VPS_HOST" "mkdir -p ~/$REMOTE_PATH ~/$REMOTE_PATH/config ~/$REMOTE_PATH/data"
+          ssh -o BatchMode=yes "$VPS_USER@$VPS_HOST" "mkdir -p ~/$REMOTE_PATH ~/$REMOTE_PATH/config ~/$REMOTE_PATH/data"
 
       - name: Sync project to VPS
         shell: bash
         run: |
           rsync -az --delete \
+            -e "ssh -o BatchMode=yes" \
             --exclude ".git" \
             --exclude "node_modules" \
             --exclude "coverage" \
