@@ -33,4 +33,4 @@ Serviço em `Node.js + TypeScript` para:
 
 ## Observação
 
-O adapter de persistência foi mantido com a interface `SqliteStorage`, mas nesta versão usa armazenamento em arquivo JSON local para evitar dependências externas e manter o projeto executável no ambiente atual.
+O adapter de persistência foi mantido com a interface `SqliteStorage`, mas nesta versão usa armazenamento em arquivo JSON local para evitar dependências externas e manter o projeto executável no ambiente atual
